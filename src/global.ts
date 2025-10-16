@@ -1,3 +1,4 @@
+import { opt } from "./options";
 import { updateBinary, findBinary } from "./binary";
 import { downloadVideo, resetStatusNeedUpdate, statusNeedUpdate, tasks } from "./download";
 
@@ -57,43 +58,19 @@ function showDownloadsWindow() {
     const path = findBinary();
     console.log("Binary path: " + path);
     const res = await utils.exec(path, ["--version"]);
-    if (res.status === 0) {
-      const version = res.stdout;
-      console.log("Version: " + version);
-      standaloneWindow.postMessage("binaryInfo", {
-        path,
-        version,
-        errorMessage: "",
-      });
-    } else {
-      const errorMessage =
-        "Error when executing the binary: " + (res.stderr ? res.stderr : "No error message");
-      console.log(errorMessage);
-      standaloneWindow.postMessage("binaryInfo", {
-        path,
-        version: "",
-        errorMessage,
-      });
-    }
+    standaloneWindow.postMessage("binaryInfo", {
+      path,
+      version: res.stdout,
+      errorMessage: res.stderr,
+    });
   });
 
-  standaloneWindow.onMessage("updateBinary", () => {
-    updateYTDLP();
+  standaloneWindow.onMessage("updateBinary", async () => {
+    if (opt.ytdl_path) return;
+    standaloneWindow.postMessage("updatingBinary", null);
+    const res = await updateBinary();
+    standaloneWindow.postMessage("binaryUpdated", { res });
   });
 
   standaloneWindow.open();
-}
-
-// Update yt-dlp window
-
-async function updateYTDLP() {
-  standaloneWindow.postMessage("updatingBinary", null);
-  let res = await updateBinary();
-  standaloneWindow.postMessage("binaryUpdated", { res });
-}
-
-async function showDownloadYTDLPWindow() {
-  showDownloadsWindow();
-  await new Promise((r) => setTimeout(r, 1000));
-  updateYTDLP();
 }
