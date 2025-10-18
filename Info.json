@@ -25,6 +25,9 @@
     "video_quality": "best",
     "max_video_height": 1080,
     "custom_ytdl_format": "",
-    "ytdl_format": ""
+    "ytdl_format": "",
+    "cookies": "raw",
+    "raw_cookies": "",
+    "handle": ""
   }
 }

@@ -1,4 +1,5 @@
 import { opt } from "./options";
+import { getPlaylists } from "./yt-music";
 import { updateBinary, findBinary } from "./binary";
 import { downloadVideo, resetStatusNeedUpdate, statusNeedUpdate, tasks } from "./download";
 
@@ -70,6 +71,11 @@ function showDownloadsWindow() {
     standaloneWindow.postMessage("updatingBinary", null);
     const res = await updateBinary();
     standaloneWindow.postMessage("binaryUpdated", { res });
+  });
+
+  standaloneWindow.onMessage("getPlaylists", async () => {
+    const res = await getPlaylists();
+    standaloneWindow.postMessage("showPlaylists", { res });
   });
 
   standaloneWindow.open();

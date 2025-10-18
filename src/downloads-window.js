@@ -38,6 +38,11 @@ function init() {
     document.getElementById("download-info").style.color = res.status === 0 ? "" : "#ff3b30";
   });
 
+  iina.onMessage("showPlaylists", ({ res }) => {
+    document.getElementById("show-playlists").innerHTML =
+      res.status === 0 ? "<ul>" + res.stdout + "</ul>" : res.stderr;
+  });
+
   window.openFile = function (file) {
     iina.postMessage("openFile", { file: b64_to_utf8(file) });
   };
@@ -52,6 +57,15 @@ function init() {
 
   document.getElementById("download-binary").addEventListener("click", () => {
     iina.postMessage("updateBinary");
+  });
+
+  document.getElementById("get-playlists").addEventListener("click", () => {
+    iina.postMessage("getPlaylists");
+  });
+
+  document.getElementById("show-playlists").addEventListener("click", (event) => {
+    event.preventDefault();
+    iina.postMessage("openFile", { file: event.target.closest("a").href });
   });
 }
 
