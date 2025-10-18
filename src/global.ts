@@ -54,22 +54,23 @@ function showDownloadsWindow() {
     file.showInFinder(fileName);
   });
 
-  standaloneWindow.onMessage("getBinaryInfo", async () => {
+  standaloneWindow.onMessage("verifyBinary", async () => {
     const ytdl = findBinary();
     console.log("Binary path: " + ytdl);
     const res = await utils.exec(ytdl, ["--version"]);
-    standaloneWindow.postMessage("binaryInfo", {
+    standaloneWindow.postMessage("binaryResult", {
       path: ytdl,
-      version: res.stdout,
-      errorMessage: res.stderr,
+      res: res,
     });
   });
 
   standaloneWindow.onMessage("updateBinary", async () => {
-    if (opt.ytdl_path) return;
-    standaloneWindow.postMessage("updatingBinary", null);
+    if (opt.ytdl_path) {
+      standaloneWindow.postMessage("binaryDisableUpdate", null);
+      return;
+    }
     const res = await updateBinary();
-    standaloneWindow.postMessage("binaryUpdated", { res });
+    standaloneWindow.postMessage("binaryExecuted", { res: res, id: "ytdlp" });
   });
 
   standaloneWindow.open();

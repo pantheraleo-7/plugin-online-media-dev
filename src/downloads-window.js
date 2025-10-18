@@ -21,21 +21,20 @@ function init() {
       item[`is_${item.status}`] = true;
       item.dest_base64 = utf8_to_b64(item.dest);
     });
-    document.getElementById("content").innerHTML = mustache.render(TEMPLATE, msg);
+    document.getElementById("download-content").style.display = "block";
+    document.getElementById("download-content").innerHTML = mustache.render(TEMPLATE, msg);
   });
 
-  iina.onMessage("updatingBinary", () => {
-    document.getElementById("binary-desc").textContent = "";
-    document.getElementById("binary-version").textContent = "";
-    document.getElementById("download-info").textContent = "";
-    document.getElementById("downloading").style.display = "block";
+  iina.onMessage("binaryDisableUpdate", () => {
+    document.getElementById("update-binary").disabled = true;
+    document.getElementById(`ytdlp-spinner-container`).style.display = "none";
+    document.getElementById("ytdlp-result").style.display = "block";
+    document.getElementById("ytdlp-result").textContent = `A custom yt-dlp installation is in use,
+      please update it manually or (if managed) via your package/tool manager.`;
   });
 
-  iina.onMessage("binaryUpdated", ({ res }) => {
-    document.getElementById("downloading").style.display = "none";
-    document.getElementById("download-info").textContent =
-      res.status === 0 ? res.stdout : res.stderr;
-    document.getElementById("download-info").style.color = res.status === 0 ? "" : "#ff3b30";
+  iina.onMessage("binaryExecuted", ({ res, msg, id, tag = "pre" }) => {
+    binary_executed(res, msg, id, tag);
   });
 
   window.openFile = function (file) {
@@ -46,11 +45,12 @@ function init() {
     iina.postMessage("revealFile", { fileName: b64_to_utf8(file) });
   };
 
-  document.getElementById("check-binary").addEventListener("click", () => {
-    updateBinaryInfo();
+  document.getElementById("verify-binary").addEventListener("click", () => {
+    verifyBinary();
   });
 
-  document.getElementById("download-binary").addEventListener("click", () => {
+  document.getElementById("update-binary").addEventListener("click", () => {
+    binary_executing("Downloading...", "ytdlp");
     iina.postMessage("updateBinary");
   });
 }
@@ -65,30 +65,50 @@ function b64_to_utf8(str) {
   return decodeURIComponent(escape(window.atob(str)));
 }
 
-function updateBinaryInfo() {
-  document.getElementById("download-info").textContent = "";
-  document.getElementById("binary-desc").textContent = "Checking for yt-dlp...";
-  iina.postMessage("getBinaryInfo");
-  iina.onMessage("binaryInfo", ({ path, version, errorMessage }) => {
-    let desc = "";
+function binary_executing(msg, id) {
+  document.getElementById(`${id}-result`).style.display = "none";
+  document.getElementById(`${id}-spinner-container`).style.display = "block";
+  document.getElementById(`${id}-spinner-message`).textContent = msg;
+}
+
+function binary_executed(res, msg, id, tag = "pre") {
+  document.getElementById(`${id}-spinner-container`).style.display = "none";
+  document.getElementById(`${id}-result`).style.display = "block";
+  document.getElementById(`${id}-result`).style.color = res.status === 0 ? "" : "#ff3b30";
+  document.getElementById(`${id}-result`).innerHTML =
+    (msg ? msg : "") +
+    (res.status === 0 ? `<${tag}>` + res.stdout + `</${tag}>` : "<pre>" + res.stderr + "</pre>");
+}
+
+function verifyBinary() {
+  binary_executing("Verifying...", "ytdlp");
+
+  iina.postMessage("verifyBinary");
+  iina.onMessage("binaryResult", ({ path, res }) => {
+    let msg = "";
     if (path === null) {
-      desc = `Unable to find yt-dlp bundled with IINA.
+      msg += `Unable to find yt-dlp bundled with IINA.
         Troubleshooting:
         - Reinstall IINA
         - If you have an existing installation of yt-dlp, either put it in $PATH
         or set its path in 'Plugins>Online Media>Settings>Custom yt-dlp path'`;
+      document.getElementById("update-binary").disabled = true;
     } else if (path === "iina-ytdl") {
-      desc = `You are using yt-dlp bundled with IINA.
-        It is recommended to keep it up to date using the button below.`;
+      msg += `You are using yt-dlp bundled with IINA. It is recommended to keep it up to date.`;
+      document.getElementById("update-binary").disabled = false;
     } else {
-      desc = `You are using a custom yt-dlp installation, configured in the plugin settings.
+      msg += `You are using a custom yt-dlp installation, configured in the plugin settings.
         You may need to update it manually.`;
-      document.getElementById("download-binary").style.display = "none";
+      path = path.replaceAll("/", "/<wbr>");
+      document.getElementById("update-binary").disabled = true;
     }
-    document.getElementById("binary-desc").textContent = desc;
 
-    const info = `Version: ${version}` + (path && path !== "iina-ytdl" ? `<br>Path: ${path}` : "");
-    document.getElementById("binary-version").innerHTML = errorMessage ? errorMessage : info;
+    msg +=
+      "<br><br>" +
+      (path && path !== "iina-ytdl" ? `Path: <pre>${path}</pre><br>` : "") +
+      (res.status === 0 ? "Version: " : "");
+
+    binary_executed(res, msg, "ytdlp");
   });
 }
 

@@ -52,11 +52,7 @@
       <input type="text" data-pref-key="ytdl_path" style="width: 100%; margin-top: 2px" />
     </label>
     <p class="small secondary pref-help">
-      Enter the path to the executable. Hint:
-      <br>- You can put just <code>yt-dlp</code> if yt-dlp is already in the $PATH
-      <br>- Uv/pipx-installed yt-dlp is typically located at <code>~/.local/bin/yt-dlp</code>
-      <br>- Homebrew-installed yt-dlp is typically located at <code>/opt/homebrew/bin/yt-dlp</code> for Apple Silicon and
-      <code>/usr/local/bin/yt-dlp</code> for macOS Intel
+      Path to the executable. If in $PATH, just its name.
     </p>
   </div>
   <div class="pref-section">
@@ -104,18 +100,16 @@
       Try yt-dlp first
     </label>
     <p class="small secondary pref-help">
-      Try parsing the URL with yt-dpl first, if it fails, then with IINA's engine - mpv.
-      Instead of the default, where mpv is tried first.
+      Parse the URL with yt-dlp first, instead of (the default) mpv.
     </p>
   </div>
   <div class="pref-section">
     <label>
       <input type="checkbox" data-type="bool" data-pref-key="use_manifest" />
-      Use manifest URL
+      Use master manifest URL
     </label>
     <p class="small secondary pref-help">
-      Use the master manifest URL for formats like HLS and DASH, if available,
-      allowing for video/audio selection at runtime.
+      Access the master manifest URL, if available, to fetch all available video/audio qualities.
     </p>
   </div>
   <div class="pref-section">
@@ -125,8 +119,7 @@
         spellcheck="false" style="width: 100%; margin-top: 2px" />
     </label>
     <p class="small secondary pref-help">
-      Additional raw options to pass to yt-dlp.
-      <br>For example: <code>--write-auto-sub --sub-langs en</code>
+      Additional options to pass to yt-dlp.
     </p>
   </div>
 </body>
