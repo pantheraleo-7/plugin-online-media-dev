@@ -53,6 +53,16 @@ function init() {
     binary_executing("Downloading...", "ytdlp");
     iina.postMessage("updateBinary");
   });
+
+  document.getElementById("fetch-playlists").addEventListener("click", () => {
+    binary_executing("Fetching...", "ytplaylists");
+    iina.postMessage("fetchPlaylists");
+  });
+
+  document.getElementById("ytplaylists-result").addEventListener("click", (event) => {
+    event.preventDefault();
+    iina.postMessage("openFile", { file: event.target.closest("a").href });
+  });
 }
 
 document.addEventListener("DOMContentLoaded", init);

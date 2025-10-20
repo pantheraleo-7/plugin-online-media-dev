@@ -34,6 +34,22 @@ export const opt = {
   get includeAutoSubs(): boolean {
     return preferences.get("include_auto_subs");
   },
+  get handle(): string {
+    return preferences.get("handle").replace("@", "");
+  },
+  get useBrowser(): boolean {
+    const cookies_from = preferences.get("cookies_from");
+    return cookies_from !== "cookies" && cookies_from === "browser";
+  },
+  get cookies(): string {
+    const cookies_from = preferences.get("cookies_from");
+    switch (cookies_from) {
+      case "cookies":
+        return preferences.get("raw_cookies");
+      case "browser":
+        return preferences.get("browser_name");
+    }
+  },
 };
 
 let urlBlackList: RegExp[];

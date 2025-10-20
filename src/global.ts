@@ -1,4 +1,5 @@
 import { opt } from "./options";
+import { fetchPlaylists } from "./yt-playlists";
 import { updateBinary, findBinary } from "./binary";
 import { downloadVideo, resetStatusNeedUpdate, statusNeedUpdate, tasks } from "./download";
 
@@ -71,6 +72,11 @@ function showDownloadsWindow() {
     }
     const res = await updateBinary();
     standaloneWindow.postMessage("binaryExecuted", { res: res, id: "ytdlp" });
+  });
+
+  standaloneWindow.onMessage("fetchPlaylists", async () => {
+    const res = await fetchPlaylists();
+    standaloneWindow.postMessage("binaryExecuted", { res: res, id: "ytplaylists", tag: "ul" });
   });
 
   standaloneWindow.open();

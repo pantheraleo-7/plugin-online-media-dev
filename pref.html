@@ -122,6 +122,42 @@
       Additional options to pass to yt-dlp.
     </p>
   </div>
+  <div class="pref-section">
+    <label>
+      YouTube handle:
+      <input type="text" data-pref-key="handle" autocomplete="off" autocorrect="off" autocapitalize="off"
+        spellcheck="false" style="width: 100%; margin-top: 2px" />
+    </label>
+    <p class="small secondary pref-help">
+      YouTube handle of the channel to fetch playlists from.
+    </p>
+  </div>
+  <div class="pref-section">
+    Authentication cookies:
+    <div style="margin-top: 4px; line-height: 24px">
+      <div>
+        <label><input type="radio" name="cookies_from" value="browser" data-pref-key />
+          Browser:</label>
+        <input type="text" data-pref-key="browser_name" list="browser_name">
+        <datalist id="browser_name">
+          <option value="Safari">
+          <option value="Firefox">
+          <option value="Chrome">
+          <option value="Edge">
+          <option value="Brave">
+          <option value="Opera">
+          <option value="Vivaldi">
+          <option value="Whale">
+          <option value="Chromium">
+        </datalist>
+      </div>
+      <div>
+        <label><input type="radio" name="cookies_from" value="cookies" data-pref-key />
+          Cookies:</label>
+        <input type="text" data-pref-key="raw_cookies" />
+      </div>
+    </div>
+  </div>
 </body>
 
 </html>
